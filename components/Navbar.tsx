@@ -3,12 +3,17 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { AddLogoButton } from "@/components/AddLogoButton";
+import { PinModal } from "@/components/PinModal";
+import { UploadLogoModal } from "@/components/UploadLogoModal";
 import { brands } from "@/lib/brands.config";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dbBrands, setDbBrands] = useState<any[]>([]);
+  const [pinOpen, setPinOpen] = useState(false);
+  const [uploadOpen, setUploadOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -79,22 +84,8 @@ export function Navbar() {
               </div>
             </div>
           </div>
-          <a
-            href="#guidelines"
-            className="text-sm font-medium transition-colors hover:text-[#1876F4]"
-            style={{ color: "#0F172A" }}
-          >
-            Usage Guidelines
-          </a>
-          <a
-            href="mailto:brand@trunexa.com"
-            className="text-sm font-medium transition-colors hover:text-[#1876F4]"
-            style={{ color: "#0F172A" }}
-          >
-            Contact
-          </a>
+          <AddLogoButton onClick={() => setPinOpen(true)} />
         </div>
-
         {/* Mobile menu button */}
         <button
           className="inline-flex items-center justify-center rounded-lg p-2 md:hidden"
@@ -145,24 +136,28 @@ export function Navbar() {
               </a>
             ))}
           </div>
-          <div className="mt-2 border-t pt-2" style={{ borderColor: "#E5E7EB" }}>
-            <a
-              href="#guidelines"
-              className="block rounded-lg px-3 py-2 text-sm hover:bg-[#F8F9FB]"
-              style={{ color: "#0F172A" }}
-            >
-              Usage Guidelines
-            </a>
-            <a
-              href="mailto:brand@trunexa.com"
-              className="block rounded-lg px-3 py-2 text-sm hover:bg-[#F8F9FB]"
-              style={{ color: "#0F172A" }}
-            >
-              Contact
-            </a>
+          <div className="mt-4">
+            <AddLogoButton onClick={() => { setPinOpen(true); setMobileMenuOpen(false); }} />
           </div>
         </div>
       )}
+      {/* PIN Modal */}
+      <PinModal
+        open={pinOpen}
+        onOpenChange={setPinOpen}
+        onSuccess={() => setUploadOpen(true)}
+      />
+
+      {/* Upload Modal */}
+      <UploadLogoModal
+        open={uploadOpen}
+        onOpenChange={setUploadOpen}
+        brands={dbBrands}
+        onUploaded={() => {
+          // Optionally trigger a refresh if needed
+          window.location.reload();
+        }}
+      />
     </nav>
   );
 }

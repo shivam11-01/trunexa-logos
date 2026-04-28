@@ -9,18 +9,16 @@ interface AddLogoButtonProps {
 export function AddLogoButton({ onClick }: AddLogoButtonProps) {
   return (
     <Button
-      variant="outline"
-      size="sm"
       onClick={onClick}
-      className="ml-auto shrink-0 text-sm font-medium transition-colors hover:bg-[#EEF2FF]"
+      className="ml-auto shrink-0 h-10 px-4 text-sm font-medium transition-colors hover:opacity-90"
       style={{
-        borderColor: "#1876F4",
-        color: "#1876F4",
-        borderRadius: 8,
+        backgroundColor: "#1876F4",
+        color: "white",
+        borderRadius: 12,
       }}
       id="add-logo-btn"
     >
-      + Add Logo
+      Add Logo
     </Button>
   );
 }

@@ -78,8 +78,6 @@ export function BrandSection({
           >
             {brand.category}
           </Badge>
-          {/* Add Logo button pushed to right */}
-          <AddLogoButton onClick={() => setPinOpen(true)} />
         </div>
 
         <p className="mb-10 max-w-2xl text-base" style={{ color: "#6B7280" }}>
@@ -108,7 +106,6 @@ export function BrandSection({
               <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M4.5 20.25h15A2.25 2.25 0 0021.75 18V6a2.25 2.25 0 00-2.25-2.25H4.5A2.25 2.25 0 002.25 6v12A2.25 2.25 0 004.5 20.25zM15.75 9.75a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
             </svg>
             <p className="text-sm font-medium" style={{ color: "#6B7280" }}>No logos yet</p>
-            <p className="text-xs mt-1" style={{ color: "#6B7280" }}>Click "+ Add Logo" to upload the first one</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
@@ -123,22 +120,6 @@ export function BrandSection({
           </div>
         )}
       </div>
-
-      {/* PIN Modal */}
-      <PinModal
-        open={pinOpen}
-        onOpenChange={setPinOpen}
-        onSuccess={() => setUploadOpen(true)}
-      />
-
-      {/* Upload Modal */}
-      <UploadLogoModal
-        open={uploadOpen}
-        onOpenChange={setUploadOpen}
-        brands={allDbBrands}
-        defaultBrandId={dbBrand?.id}
-        onUploaded={handleUploaded}
-      />
     </section>
   );
 }

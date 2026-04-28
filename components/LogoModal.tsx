@@ -20,7 +20,7 @@ import { FormatSelect, type FormatOption } from "@/components/FormatSelect";
 import { downloadFile } from "@/lib/download";
 import { copySvgToClipboard, copyPngToClipboard } from "@/lib/copy";
 import { toast } from "sonner";
-import type { LogoGroup, Brand, ColorVariant } from "@/lib/brands.config";
+import type { LogoGroup, Brand, ColorVariant, LogoFile } from "@/lib/brands.config";
 
 interface LogoModalProps {
   group: LogoGroup | null;

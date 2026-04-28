@@ -82,22 +82,31 @@ export function LogoModal({ group, brand, open, onOpenChange }: LogoModalProps) 
     const fileSet = group.legacyLogo.colorVariants?.[colorVariant] ?? group.legacyLogo.files ?? {};
     
     if (fileSet.svg) availableFormats.push("svg");
-    if (fileSet.png1x) availableFormats.push("png1x");
-    if (fileSet.png2x) availableFormats.push("png2x");
-    if (fileSet.png4x) availableFormats.push("png4x");
+    if (fileSet.png1x) availableFormats.push("png");
+    if (fileSet.png2x) availableFormats.push("pngx2");
+    if (fileSet.png4x) availableFormats.push("pngx4");
     if (fileSet.pdf) availableFormats.push("pdf");
 
     if (availableFormats.length === 0) {
       const legacyFiles = group.legacyLogo.files ?? {};
       if (legacyFiles.svg) availableFormats.push("svg");
-      if (legacyFiles.png1x) availableFormats.push("png1x");
-      if (legacyFiles.png2x) availableFormats.push("png2x");
-      if (legacyFiles.png4x) availableFormats.push("png4x");
+      if (legacyFiles.png1x) availableFormats.push("png");
+      if (legacyFiles.png2x) availableFormats.push("pngx2");
+      if (legacyFiles.png4x) availableFormats.push("pngx4");
       if (legacyFiles.pdf) availableFormats.push("pdf");
     }
 
     const legacyFiles = group.legacyLogo.files ?? {};
-    currentFileUrl = fileSet[format] ?? legacyFiles[format] ?? "";
+    const formatToLegacyKey: Record<FormatOption, keyof LogoFile> = {
+      svg: "svg",
+      png: "png1x",
+      pngx2: "png2x",
+      pngx4: "png4x",
+      jpg: "png1x",
+      pdf: "pdf",
+    };
+    const legacyKey = formatToLegacyKey[format];
+    currentFileUrl = fileSet[legacyKey] ?? legacyFiles[legacyKey] ?? "";
     previewSrc = fileSet.svg ?? fileSet.png1x ?? legacyFiles.svg ?? legacyFiles.png1x ?? "";
   }
 

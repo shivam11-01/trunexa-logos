@@ -13,11 +13,11 @@ const instrumentSans = Instrument_Sans({
 export const metadata: Metadata = {
   title: "Logo Repository — Trunexa",
   description:
-    "Download and use official logos for all Trunexa brands. Available in SVG, PNG, and PDF formats.",
+    "Download and use official logos for all Trunexa brands. \n Available in SVG, PNG, JPG, and PDF formats.",
   openGraph: {
     title: "Logo Repository — Trunexa",
     description:
-      "Download and use official logos for all Trunexa brands. Available in SVG, PNG, and PDF formats.",
+      "Download and use official logos for all Trunexa brands. \n Available in SVG, PNG, JPG, and PDF formats.",
     type: "website",
   },
 };

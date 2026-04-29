@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { AddLogoButton } from "@/components/AddLogoButton";
@@ -9,6 +10,7 @@ import { UploadLogoModal } from "@/components/UploadLogoModal";
 import { brands } from "@/lib/brands.config";
 
 export function Navbar() {
+  const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dbBrands, setDbBrands] = useState<any[]>([]);
@@ -43,7 +45,7 @@ export function Navbar() {
       }`}
       style={{ borderBottom: "1px solid #E5E7EB" }}
     >
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-16 max-w-[1600px] items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Left: Logo + Text */}
         <Link href="/" className="flex items-center gap-3">
           <Image
@@ -154,8 +156,7 @@ export function Navbar() {
         onOpenChange={setUploadOpen}
         brands={dbBrands}
         onUploaded={() => {
-          // Optionally trigger a refresh if needed
-          window.location.reload();
+          router.refresh();
         }}
       />
     </nav>

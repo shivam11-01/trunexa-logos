@@ -1,4 +1,4 @@
-export function HeroSection() {
+export function HeroSection({ brandCount = 0 }: { brandCount?: number }) {
   return (
     <section className="relative overflow-hidden">
       {/* Subtle background pattern */}
@@ -11,7 +11,7 @@ export function HeroSection() {
         }}
       />
 
-      <div className="mx-auto max-w-7xl px-4 py-20 text-center sm:px-6 sm:py-28 lg:px-8">
+      <div className="py-20 text-center sm:py-28">
         {/* Eyebrow */}
         <p
           className="mb-4 text-sm font-semibold tracking-wide uppercase"
@@ -34,13 +34,13 @@ export function HeroSection() {
           style={{ color: "#6B7280" }}
         >
           Download and use official logos for all Trunexa brands. Available in
-          SVG, PNG, and PDF formats.
+          SVG, PNG, JPG, and PDF formats.
         </p>
 
         {/* Stat pills */}
         <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-          <StatPill icon={<BrandIcon />} text="6 Brands" />
-          <StatPill icon={<FormatIcon />} text="SVG · PNG · PDF" />
+          <StatPill icon={<BrandIcon />} text={`${brandCount} Brands`} />
+          <StatPill icon={<FormatIcon />} text="SVG · PNG · JPG · PDF" />
           <StatPill icon={<CheckIcon />} text="Always Up to Date" />
         </div>
       </div>

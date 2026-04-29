@@ -16,8 +16,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
-import { uploadLogo } from "@/lib/storage";
-import { addLogo } from "@/lib/db";
 import { toast } from "sonner";
 import type { SupabaseBrand } from "@/lib/brands.config";
 
@@ -39,8 +37,7 @@ export function UploadLogoModal({
   const [file, setFile] = useState<File | null>(null);
   const [dragging, setDragging] = useState(false);
   const [logoName, setLogoName] = useState("");
-  const [logoVariant, setLogoVariant] = useState("");
-  const [color, setColor] = useState("black");
+  const [color, setColor] = useState("Black");
   const [fileType, setFileType] = useState("SVG");
   const [brandId, setBrandId] = useState(defaultBrandId ?? "");
   const [progress, setProgress] = useState(0);
@@ -50,8 +47,7 @@ export function UploadLogoModal({
   const resetForm = () => {
     setFile(null);
     setLogoName("");
-    setLogoVariant("");
-    setColor("black");
+    setColor("Black");
     setFileType("SVG");
     setBrandId(defaultBrandId ?? "");
     setProgress(0);
@@ -65,7 +61,7 @@ export function UploadLogoModal({
   }, []);
 
   const handleUpload = async () => {
-    if (!file || !logoName.trim() || !logoVariant.trim() || !brandId) {
+    if (!file || !logoName.trim() || !brandId) {
       toast.error("Please fill in all required fields.");
       return;
     }
@@ -74,26 +70,37 @@ export function UploadLogoModal({
 
     setUploading(true);
     try {
-      const publicUrl = await uploadLogo(
-        file,
-        selectedBrand.slug,
-        color
-      );
+      const form = new FormData();
+      form.append("file", file);
+      form.append("brand_id", selectedBrand.id);
+      form.append("brand_slug", selectedBrand.slug);
+      form.append("name", logoName.trim());
+      form.append("color", color.toLowerCase());
+      form.append("file_type", fileType);
 
-      await addLogo({
-        brand_id: selectedBrand.id,
-        name: logoName.trim(),
-        variant: logoVariant.trim(),
-        color,
-        file_type: fileType,
-        storage_path: `${selectedBrand.slug}/${color}/${file.name}`,
-        public_url: publicUrl,
-      });
+      const res = await fetch("/api/upload", { method: "POST", body: form });
+      const json = await res.json();
 
-      toast.success("Logo uploaded successfully");
+      if (!res.ok) {
+        console.error("Upload API error:", json.error);
+        toast.error(`Upload failed: ${json.error ?? "Please try again."}`);
+        return;
+      }
+
+      // Close modal and reset form immediately
       resetForm();
       onOpenChange(false);
-      onUploaded?.();
+
+      // Show success toast after modal is gone (avoids unmount race)
+      setTimeout(() => {
+        toast.success("Logo uploaded successfully! 🎉", {
+          description: `"${logoName.trim()}" has been added to the repository.`,
+          duration: 4000,
+        });
+        // Notify all logo sections to re-fetch
+        window.dispatchEvent(new CustomEvent("logos-updated"));
+        onUploaded?.();
+      }, 100);
     } catch (err) {
       console.error(err);
       toast.error("Upload failed. Please try again.");
@@ -125,9 +132,8 @@ export function UploadLogoModal({
         <div className="flex flex-col gap-4">
           {/* File Upload Area */}
           <div
-            className={`relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 text-center transition-colors ${
-              dragging ? "border-[#1876F4] bg-[#EEF2FF]" : "border-[#E5E7EB] hover:border-[#1876F4]"
-            }`}
+            className={`relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 text-center transition-colors ${dragging ? "border-[#1876F4] bg-[#EEF2FF]" : "border-[#E5E7EB] hover:border-[#1876F4]"
+              }`}
             onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
             onDragLeave={() => setDragging(false)}
             onDrop={handleDrop}
@@ -171,69 +177,69 @@ export function UploadLogoModal({
               value={logoName}
               onChange={(e) => setLogoName(e.target.value)}
               placeholder="e.g. Trunexa Primary Horizontal"
-              className="h-10 rounded-lg border px-3 text-sm outline-none transition-all focus:ring-2 focus:ring-[#1876F4]"
-              style={{ borderColor: "#E5E7EB", color: "#0F172A" }}
+              className="h-10 border px-3 text-sm outline-none transition-all focus:ring-2 focus:ring-[#1876F4]"
+              style={{ borderColor: "#E5E7EB", color: "#0F172A", borderRadius: 12 }}
               id="logo-name-input"
             />
           </div>
 
-          {/* Logo Variant */}
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium" style={{ color: "#6B7280" }}>Logo Variant *</label>
-            <input
-              type="text"
-              value={logoVariant}
-              onChange={(e) => setLogoVariant(e.target.value)}
-              placeholder="e.g. Primary, Icon, Stacked"
-              className="h-10 rounded-lg border px-3 text-sm outline-none transition-all focus:ring-2 focus:ring-[#1876F4]"
-              style={{ borderColor: "#E5E7EB", color: "#0F172A" }}
-              id="logo-variant-input"
-            />
-          </div>
 
-          {/* Color + File Type + Brand — 3 cols */}
-          <div className="grid grid-cols-3 gap-3">
+          {/* Color + File Type — Horizontal Layout */}
+          <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium" style={{ color: "#6B7280" }}>Color</label>
+              <label className="text-xs font-medium" style={{ color: "#6B7280" }}>Color *</label>
               <Select value={color} onValueChange={(v) => v && setColor(v)}>
-                <SelectTrigger className="rounded-lg" style={{ borderColor: "#E5E7EB", borderRadius: 8 }} id="upload-color-select">
+                <SelectTrigger className="w-full h-10" style={{ borderColor: "#E5E7EB", borderRadius: 12 }} id="upload-color-select">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="black">Black</SelectItem>
-                  <SelectItem value="white">White</SelectItem>
+                  <SelectItem value="Black">Black</SelectItem>
+                  <SelectItem value="White">White</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium" style={{ color: "#6B7280" }}>File Type</label>
+              <label className="text-xs font-medium" style={{ color: "#6B7280" }}>File Type *</label>
               <Select value={fileType} onValueChange={(v) => v && setFileType(v)}>
-                <SelectTrigger className="rounded-lg" style={{ borderColor: "#E5E7EB", borderRadius: 8 }} id="upload-filetype-select">
+                <SelectTrigger className="w-full h-10" style={{ borderColor: "#E5E7EB", borderRadius: 12 }} id="upload-filetype-select">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="SVG">SVG</SelectItem>
                   <SelectItem value="PNG">PNG</SelectItem>
-                  <SelectItem value="PNGx2">PNG x2</SelectItem>
-                  <SelectItem value="PNGx4">PNG x4</SelectItem>
                   <SelectItem value="JPG">JPG</SelectItem>
                   <SelectItem value="PDF">PDF</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium" style={{ color: "#6B7280" }}>Brand *</label>
-              <Select value={brandId} onValueChange={(v) => v && setBrandId(v)}>
-                <SelectTrigger className="rounded-lg" style={{ borderColor: "#E5E7EB", borderRadius: 8 }} id="upload-brand-select">
-                  <SelectValue placeholder="Brand" />
-                </SelectTrigger>
-                <SelectContent>
-                  {brands.map((b) => (
-                    <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          </div>
+
+          {/* Brand — Full row to prevent cutting */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-medium" style={{ color: "#6B7280" }}>Brand *</label>
+            <Select
+              key={brands.length}
+              value={brandId}
+              onValueChange={(v) => v && setBrandId(v)}
+            >
+              <SelectTrigger className="w-full h-10" style={{ borderColor: "#E5E7EB", borderRadius: 12 }} id="upload-brand-select">
+                <SelectValue placeholder="Select a brand">
+                  {(() => {
+                    const selected = brands.find(b => b.id === brandId);
+                    if (!selected) return null;
+                    return selected.name.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ");
+                  })()}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {brands.map((b) => (
+                  <SelectItem key={b.id} value={b.id}>
+                    {b.name.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ")}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Progress bar */}
@@ -249,20 +255,19 @@ export function UploadLogoModal({
           {/* Actions */}
           <div className="flex gap-3 pt-1">
             <Button
-              variant="ghost"
               onClick={() => { onOpenChange(false); resetForm(); }}
               disabled={uploading}
-              className="flex-1"
-              style={{ borderRadius: 8 }}
+              className="flex-1 h-10 transition-colors hover:bg-[#E2E8F0]"
+              style={{ backgroundColor: "#F1F5F9", color: "#0F172A", borderRadius: 12 }}
               id="upload-cancel-btn"
             >
               Cancel
             </Button>
             <Button
               onClick={handleUpload}
-              disabled={uploading || !file || !logoName.trim() || !logoVariant.trim() || !brandId}
-              className="flex-1 font-medium"
-              style={{ backgroundColor: "#1876F4", borderRadius: 8 }}
+              disabled={uploading || !file || !logoName.trim() || !brandId}
+              className="flex-1 h-10 font-medium transition-colors hover:opacity-90"
+              style={{ backgroundColor: "#1876F4", color: "white", borderRadius: 12 }}
               id="upload-submit-btn"
             >
               {uploading ? "Uploading…" : "Upload Logo"}

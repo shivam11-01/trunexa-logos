@@ -9,10 +9,10 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 const brands = [
-  { name: 'Trunexa', slug: 'trunexa', description: 'Parent brand of the Trunexa Group', category: 'Parent Brand', order: 1 },
-  { name: 'Trucrux', slug: 'trucrux', description: 'Core infrastructure and platform services', category: 'Infrastructure', order: 2 },
+  { name: 'Trunexa', slug: 'trunexa', description: 'Our own technology house', category: 'Parent Brand', order: 1 },
+  { name: 'Trucrux', slug: 'trucrux', description: 'High performance boards', category: 'Infrastructure', order: 2 },
   { name: 'Chargnex', slug: 'chargnex', description: 'EV charging solutions', category: 'EV Charging', order: 3 },
-  { name: 'Flownex', slug: 'flownex', description: 'Workflow and operations platform', category: 'Operations', order: 4 },
+  { name: 'Flownex', slug: 'flownex', description: 'Payment ready transit solutions', category: 'Operations', order: 4 },
   { name: 'Paynex', slug: 'paynex', description: 'Payments and financial infrastructure', category: 'Payments', order: 5 },
   { name: 'Others', slug: 'others', description: 'Miscellaneous and umbrella brand assets', category: 'Miscellaneous', order: 6 },
 ]

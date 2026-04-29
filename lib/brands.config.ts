@@ -1,8 +1,7 @@
 export interface LogoFile {
   svg?: string;
   png1x?: string;
-  png2x?: string;
-  png4x?: string;
+  jpg?: string;
   pdf?: string;
 }
 
@@ -67,7 +66,7 @@ export interface LogoGroup {
 
 export function groupSupabaseLogos(flatLogos: SupabaseLogo[]): LogoGroup[] {
   const groups = new Map<string, LogoGroup>();
-  
+
   for (const row of flatLogos) {
     const key = `${row.name}-${row.variant}`;
     if (!groups.has(key)) {
@@ -81,7 +80,7 @@ export function groupSupabaseLogos(flatLogos: SupabaseLogo[]): LogoGroup[] {
     }
     groups.get(key)!.rows.push(row);
   }
-  
+
   return Array.from(groups.values());
 }
 
@@ -98,5 +97,61 @@ export function convertLegacyToGroup(logo: Logo): LogoGroup {
 
 
 
-export const brands: Brand[] = [];
+// ─────────────────────────────────────────────────────────────────────────────
+// HARDCODED BRAND CONFIG — edit here to change names, descriptions, categories.
+// The `slug` must match what is stored in Supabase (used only to resolve the
+// brand's DB id for logo fetching — display info is never read from the DB).
+// ─────────────────────────────────────────────────────────────────────────────
+export const BRANDS: Array<{
+  slug: string;
+  name: string;
+  description: string;
+  category: string;
+  order: number;
+}> = [
+    {
+      slug: "trunexa",
+      name: "Trunexa",
+      description: "Our own technology house",
+      category: "Design House",
+      order: 1,
+    },
+    {
+      slug: "trucrux",
+      name: "Trucrux",
+      description: "High performance boards",
+      category: "Technology",
+      order: 2,
+    },
+    {
+      slug: "chargnex",
+      name: "Chargnex",
+      description: "EV charging solutions",
+      category: "EV Solutions",
+      order: 3,
+    },
+    {
+      slug: "flownex",
+      name: "Flownex",
+      description: "Payment ready transit solutions",
+      category: "Transit Solutions",
+      order: 4,
+    },
+    {
+      slug: "paynex",
+      name: "Paynex",
+      description: "Payments and financial infrastructure",
+      category: "Payments Solutions",
+      order: 5,
+    },
+    {
+      slug: "others",
+      name: "Others",
+      description: "Miscellaneous brand assets",
+      category: "Miscellaneous",
+      order: 6,
+    },
+  ];
 
+// Legacy alias kept for backward compatibility with any remaining static refs
+export const brands: Brand[] = [];

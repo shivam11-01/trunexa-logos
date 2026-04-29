@@ -5,9 +5,10 @@ import { useSearchParams, usePathname } from "next/navigation";
 import { Navbar } from "@/components/Navbar";
 import { HeroSection } from "@/components/HeroSection";
 import { BrandSection } from "@/components/BrandSection";
+import { BrandCard } from "@/components/BrandCard";
 import { LogoModal } from "@/components/LogoModal";
 import { Separator } from "@/components/ui/separator";
-import { brands as staticBrands, type LogoGroup, type Brand, type SupabaseBrand } from "@/lib/brands.config";
+import { BRANDS, type LogoGroup, type Brand, type SupabaseBrand } from "@/lib/brands.config";
 import { getBrands } from "@/lib/db";
 
 // Inner component that uses useSearchParams (must be wrapped in Suspense)
@@ -18,40 +19,19 @@ function HomePageInner() {
   const [selectedGroup, setSelectedGroup] = useState<LogoGroup | null>(null);
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [dbBrands, setDbBrands] = useState<SupabaseBrand[]>([]);
-  const [dbReady, setDbReady] = useState(false);
 
-  // Try to fetch brands from Supabase (if configured)
+  // dbBrands is only used to resolve slug → DB id for logo fetching.
+  // Names, descriptions, categories come from the hardcoded BRANDS config.
+  const [dbBrands, setDbBrands] = useState<SupabaseBrand[]>([]);
+
   useEffect(() => {
-    const hasConfig = !!process.env.NEXT_PUBLIC_SUPABASE_URL;
-    if (!hasConfig) return;
-    getBrands()
-      .then((fb) => { setDbBrands(fb); setDbReady(true); })
-      .catch(() => setDbReady(false));
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL) return;
+    getBrands().then(setDbBrands).catch(() => {});
   }, []);
 
-  // Deep-link: auto-open modal if ?logo= is present
-  useEffect(() => {
-    const logoId = searchParams.get("logo");
-    if (!logoId) return;
-    // Look up through static brands first, dynamic routing could be added later
-    for (const brand of staticBrands) {
-      const legacyLogo = brand.logos.find((l) => l.id === logoId);
-      if (legacyLogo) {
-        setSelectedGroup({
-          id: legacyLogo.id,
-          name: legacyLogo.name,
-          variant: legacyLogo.variant,
-          previewBg: legacyLogo.previewBg,
-          rows: [],
-          legacyLogo,
-        });
-        setSelectedBrand(brand);
-        setModalOpen(true);
-        break;
-      }
-    }
-  }, [searchParams, pathname]);
+  // Resolve a brand slug to its Supabase id (needed for logo fetching only)
+  const getDbBrand = (slug: string): SupabaseBrand | undefined =>
+    dbBrands.find((b) => b.slug === slug);
 
   const handleLogoClick = useCallback((group: LogoGroup, brand: Brand) => {
     setSelectedGroup(group);
@@ -59,40 +39,67 @@ function HomePageInner() {
     setModalOpen(true);
   }, []);
 
-  // Match each static brand with its Supabase counterpart (by slug)
-  const getDbBrand = (slug: string): SupabaseBrand | undefined =>
-    dbBrands.find((fb) => fb.slug === slug);
+  // First 5 brands go in the top grid, remainder go in full-width sections
+  const topBrands = BRANDS.slice(0, 5);
+  const bottomBrands = BRANDS.slice(5);
 
   return (
     <>
       <Navbar />
       <main className="flex-1">
-        <HeroSection />
+        <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
+          <HeroSection brandCount={BRANDS.length} />
 
-        {/* Brand Sections */}
-        {dbBrands.map((brand, i) => (
-          <div key={brand.id}>
-            <BrandSection
-              brand={{
-                id: brand.id,
-                name: brand.name,
-                slug: brand.slug,
-                description: brand.description,
-                category: brand.category,
-                logos: [], // Logos will be fetched by BrandSection itself
-              }}
-              dbBrand={brand}
-              allDbBrands={dbBrands}
-              onLogoClick={handleLogoClick}
-            />
-            {i < dbBrands.length - 1 && (
-              <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <Separator style={{ backgroundColor: "#E5E7EB" }} />
-              </div>
-            )}
+          {/* Main Brands Grid — top 5 */}
+          <div className="py-16">
+            <div className="grid grid-cols-1 gap-x-8 gap-y-16 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+              {topBrands.map((b) => {
+                const dbBrand = getDbBrand(b.slug);
+                return (
+                  <BrandCard
+                    key={b.slug}
+                    brand={{
+                      // Merge hardcoded display info with DB id
+                      id: dbBrand?.id ?? b.slug,
+                      name: b.name,
+                      slug: b.slug,
+                      description: b.description,
+                      category: b.category,
+                      order: b.order,
+                    }}
+                    onLogoClick={handleLogoClick}
+                  />
+                );
+              })}
+            </div>
           </div>
-        ))}
 
+          {/* Remaining Brands (Full Width) */}
+          {bottomBrands.length > 0 && (
+            <div className="flex flex-col gap-20 pb-20">
+              {bottomBrands.map((b) => {
+                const dbBrand = getDbBrand(b.slug);
+                return (
+                  <div key={b.slug} className="pt-10 border-t" style={{ borderColor: "#F1F5F9" }}>
+                    <BrandSection
+                      brand={{
+                        id: dbBrand?.id ?? b.slug,
+                        name: b.name,
+                        slug: b.slug,
+                        description: b.description,
+                        category: b.category,
+                        logos: [],
+                      }}
+                      dbBrand={dbBrand}
+                      allDbBrands={dbBrands}
+                      onLogoClick={handleLogoClick}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </main>
 
       <LogoModal

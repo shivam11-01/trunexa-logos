@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export type FormatOption = "svg" | "png" | "pngx2" | "pngx4" | "jpg" | "pdf";
+export type FormatOption = "svg" | "png" | "jpg" | "pdf";
 
 interface FormatSelectProps {
   value: FormatOption;
@@ -19,8 +19,6 @@ interface FormatSelectProps {
 const formatLabels: Record<FormatOption, string> = {
   svg: "SVG",
   png: "PNG",
-  pngx2: "PNG x2",
-  pngx4: "PNG x4",
   jpg: "JPG",
   pdf: "PDF",
 };

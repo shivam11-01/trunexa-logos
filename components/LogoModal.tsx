@@ -64,8 +64,6 @@ export function LogoModal({ group, brand, open, onOpenChange }: LogoModalProps) 
     const fileTypeMap: Record<FormatOption, string[]> = {
       svg: ["SVG"],
       png: ["PNG"],
-      pngx2: ["PNG"], // This would need special handling if we split storage paths
-      pngx4: ["PNG"],
       jpg: ["JPG"],
       pdf: ["PDF"],
     };
@@ -83,16 +81,12 @@ export function LogoModal({ group, brand, open, onOpenChange }: LogoModalProps) 
     
     if (fileSet.svg) availableFormats.push("svg");
     if (fileSet.png1x) availableFormats.push("png");
-    if (fileSet.png2x) availableFormats.push("pngx2");
-    if (fileSet.png4x) availableFormats.push("pngx4");
     if (fileSet.pdf) availableFormats.push("pdf");
 
     if (availableFormats.length === 0) {
       const legacyFiles = group.legacyLogo.files ?? {};
       if (legacyFiles.svg) availableFormats.push("svg");
       if (legacyFiles.png1x) availableFormats.push("png");
-      if (legacyFiles.png2x) availableFormats.push("pngx2");
-      if (legacyFiles.png4x) availableFormats.push("pngx4");
       if (legacyFiles.pdf) availableFormats.push("pdf");
     }
 
@@ -100,9 +94,7 @@ export function LogoModal({ group, brand, open, onOpenChange }: LogoModalProps) 
     const formatToLegacyKey: Record<FormatOption, keyof LogoFile> = {
       svg: "svg",
       png: "png1x",
-      pngx2: "png2x",
-      pngx4: "png4x",
-      jpg: "png1x",
+      jpg: "jpg",
       pdf: "pdf",
     };
     const legacyKey = formatToLegacyKey[format];
@@ -118,8 +110,6 @@ export function LogoModal({ group, brand, open, onOpenChange }: LogoModalProps) 
   const formatExtensions: Record<FormatOption, string> = {
     svg: ".svg",
     png: ".png",
-    pngx2: "@2x.png",
-    pngx4: "@4x.png",
     jpg: ".jpg",
     pdf: ".pdf",
   };
@@ -145,10 +135,10 @@ export function LogoModal({ group, brand, open, onOpenChange }: LogoModalProps) 
     try {
       if (format === "svg") {
         await copySvgToClipboard(currentFileUrl);
-      } else if (format.startsWith("png")) {
+      } else if (format.startsWith("png") || format === "jpg") {
         await copyPngToClipboard(currentFileUrl);
       } else {
-        toast.error("Copy is only available for SVG and PNG formats.");
+        toast.error("Copy is only available for SVG, PNG, and JPG formats.");
         setIsCopying(false);
         return;
       }

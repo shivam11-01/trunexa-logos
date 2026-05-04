@@ -52,7 +52,7 @@ function HomePageInner() {
 
           {/* Main Brands Grid — top 5 */}
           <div className="py-16">
-            <div className="grid grid-cols-1 gap-x-8 gap-y-16 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,200px),1fr))] lg:grid-cols-5 gap-x-8 gap-y-16">
               {topBrands.map((b) => {
                 const dbBrand = getDbBrand(b.slug);
                 return (

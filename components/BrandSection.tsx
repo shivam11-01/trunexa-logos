@@ -132,7 +132,7 @@ export function BrandSection({
 
         {/* Logo Grid */}
         {loadingLogos ? (
-          <div className="grid grid-cols-1 gap-x-8 gap-y-16 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,200px),1fr))] lg:grid-cols-5 gap-x-8 gap-y-16">
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="flex flex-col overflow-hidden rounded-xl border" style={{ borderColor: "#E5E7EB" }}>
                 <Skeleton className="h-48 sm:h-56" />
@@ -154,7 +154,7 @@ export function BrandSection({
             <p className="text-base font-medium" style={{ color: "#6B7280" }}>No logos yet</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-x-8 gap-y-16 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,200px),1fr))] lg:grid-cols-5 gap-x-8 gap-y-16">
             {logoGroups.map((group) => (
               <LogoCard
                 key={group.id}
